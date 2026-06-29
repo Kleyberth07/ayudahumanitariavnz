@@ -1,15 +1,13 @@
-// Asegurar que el DOM inyectado esté listo
 setTimeout(() => {
     const btnAbrir = document.getElementById('btn-abrir-modal');
     const btnCerrar = document.getElementById('btn-cerrar-modal');
     const modal = document.getElementById('modal-documentos');
     const formConfirmacion = document.getElementById('form-confirmacion');
 
-    // Inicializar Supabase (Reemplaza con tus URL y ANON_KEY)
-    const supabaseUrl = 'TU_SUPABASE_URL';
-    const supabaseKey = 'TU_SUPABASE_ANON_KEY';
-    // Descomentar cuando coloques tus credenciales
-    // const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+    // Inicialización con tus credenciales de Supabase
+    const supabaseUrl = 'https://gguybbqqeixjqtdsmljp.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdndXliYnFxZWl4anF0ZHNtbGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3NDIxNzIsImV4cCI6MjA5ODMxODE3Mn0.d9WBBnYC9LgvoKhHzA4dl4nTiE_a06EKo48kAiujIdo';
+    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
     btnAbrir.addEventListener('click', () => {
         modal.classList.add('modal-activo');
@@ -24,25 +22,75 @@ setTimeout(() => {
     formConfirmacion.addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        // Aquí iría la lógica de subir imágenes a Supabase Storage y obtener sus URLs
-        // URL_CEDULA = await supabase.storage...
-        
-        // Cambiar la vista a "Espera"
-        modal.classList.add('modal-oculto');
-        document.getElementById('modulo-confirmar').style.display = 'none';
-        document.getElementById('modulo-espera').style.display = 'block';
+        const btnEnviar = document.getElementById('btn-enviar-datos');
+        btnEnviar.disabled = true;
+        btnEnviar.innerText = "Enviando...";
 
-        /* Lógica real de Supabase a implementar:
-        const { data, error } = await supabase
-            .from('solicitudes_ayuda')
-            .insert([
-                { 
-                    nombre_completo: document.getElementById('nombre-completo').value,
-                    estatus: 'pendiente',
-                    url_cedula: 'url_storage_pendiente',
-                    url_direccion: 'url_storage_pendiente'
-                }
-            ]);
-        */
+        const nombre = document.getElementById('nombre-completo').value;
+        
+        // NOTA: Para producción real se sube a Supabase Storage. 
+        // Por ahora, guardamos un string temporal para validar el flujo de la base de datos.
+        const urlCedulaSimulada = "documentos/cedula_pendiente.jpg";
+        const urlDireccionSimulada = "documentos/rif_pendiente.jpg";
+
+        try {
+            const { data, error } = await supabase
+                .from('solicitudes_ayuda')
+                .insert([
+                    { 
+                        nombre_completo: nombre,
+                        estatus: 'pendiente',
+                        url_cedula: urlCedulaSimulada,
+                        url_direccion: urlDireccionSimulada
+                    }
+                ])
+                .select();
+
+            if (error) throw error;
+
+            if (data && data.length > 0) {
+                // Guardamos el ID generado por Supabase para usarlo en el siguiente paso (Pago Móvil)
+                localStorage.setItem('id_solicitud_ayuda', data[0].id);
+                
+                // Cambiar visualmente el estado del Dashboard a "Espera"
+                modal.classList.add('modal-oculto');
+                document.getElementById('modulo-confirmar').style.display = 'none';
+                document.getElementById('modulo-espera').style.display = 'block';
+
+                // Activar la escucha en tiempo real para cuando el Admin apruebe
+                escucharAprobacionEnTiempoReal(data[0].id);
+            }
+
+        } catch (err) {
+            alert("Error al registrar solicitud: " + err.message);
+            btnEnviar.disabled = false;
+            btnEnviar.innerText = "Enviar Documentos";
+        }
     });
-}, 100); // Pequeño retraso para asegurar que el HTML del fetch ya existe en el DOM
+
+    // Función para detectar la aprobación en tiempo real sin recargar la página
+    function escucharAprobacionEnTiempoReal(idSolicitud) {
+        supabase
+            .channel('cambios-solicitud')
+            .on('postgres_changes', { 
+                event: 'UPDATE', 
+                schema: 'public', 
+                table: 'solicitudes_ayuda',
+                filter: `id=eq.${idSolicitud}`
+            }, (payload) => {
+                if (payload.new.estatus === 'aprobado') {
+                    // Ocultamos la espera y cargamos dinámicamente el formulario de pago
+                    document.getElementById('modulo-espera').style.display = 'none';
+                    document.getElementById('modulo-pago').style.display = 'block';
+                    
+                    cargarModulo(
+                        'modulo-pago', 
+                        'formulario_pago/pago.html', 
+                        'formulario_pago/pago.css', 
+                        'formulario_pago/pago.js'
+                    );
+                }
+            })
+            .subscribe();
+    }
+}, 100);
