@@ -1,0 +1,151 @@
+:root {
+    --bg-admin: #0F172A; /* Slate oscuro profesional */
+    --bg-card: #1E293B;
+    --texto-light: #F8FAFC;
+    --color-borde: #334155;
+    --color-accent: #38BDF8;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+body {
+    background-color: var(--bg-admin);
+    color: var(--texto-light);
+    min-height: 100vh;
+}
+
+.admin-header {
+    background-color: var(--bg-card);
+    border-bottom: 1px solid var(--color-borde);
+    padding: 15px 20px;
+}
+
+.header-contenido {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.badge-rol {
+    background-color: rgba(56, 189, 248, 0.2);
+    color: var(--color-accent);
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.admin-main {
+    max-width: 1200px;
+    margin: 25px auto;
+    padding: 0 20px;
+}
+
+.metricas-rapidas {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.card-metrica {
+    background: var(--bg-card);
+    border: 1px solid var(--color-borde);
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.metrica-numero {
+    display: block;
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--color-accent);
+}
+
+.metrica-etiqueta {
+    font-size: 0.85rem;
+    color: #94A3B8;
+}
+
+.tabla-contenedor {
+    background: var(--bg-card);
+    border: 1px solid var(--color-borde);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.tabla-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--color-borde);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.btn-refrescar {
+    background: none;
+    border: 1px solid var(--color-borde);
+    color: var(--texto-light);
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.tabla-scroll {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.9rem;
+}
+
+th, td {
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--color-borde);
+}
+
+th {
+    background-color: rgba(0,0,0,0.2);
+    color: #94A3B8;
+}
+
+.doc-link {
+    color: var(--color-accent);
+    text-decoration: none;
+    margin-right: 10px;
+    font-size: 0.85rem;
+}
+
+.status-label {
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+.status-pendiente { background-color: #B45309; color: #FEF3C7; }
+.status-aprobado { background-color: #15803D; color: #DCFCE7; }
+.status-finalizado { background-color: #1E3A8A; color: #DBEAFE; }
+
+.btn-aprobar {
+    background-color: #10B981;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-aprobar:hover { background-color: #059669; }
