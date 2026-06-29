@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Control Humanitario - Admin</title>
+    <link rel="stylesheet" href="admin.css">
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <header class="admin-header">
+        <div class="header-contenido">
+            <h2>Panel de Aprobación Humanitaria</h2>
+            <span class="badge-rol">Rol: Administrador General</span>
+        </div>
+    </header>
+
+    <main class="admin-main">
+        <section class="metricas-rapidas">
+            <div class="card-metrica">
+                <span class="metrica-numero" id="num-pendientes">--</span>
+                <span class="metrica-etiqueta">Por Verificar</span>
+            </div>
+            <div class="card-metrica">
+                <span class="metrica-numero" id="num-aprobados">--</span>
+                <span class="metrica-etiqueta">Aprobados</span>
+            </div>
+        </section>
+
+        <section class="tabla-contenedor">
+            <div class="tabla-header">
+                <h3>Solicitudes Recientes</h3>
+                <button id="btn-refrescar" class="btn-refrescar">🔄 Actualizar</button>
+            </div>
+            
+            <div class="tabla-scroll">
+                <table id="tabla-solicitudes">
+                    <thead>
+                        <tr>
+                            <th>Afectado</th>
+                            <th>Documentación</th>
+                            <th>Estado Actual</th>
+                            <th>Datos de Pago</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lista-solicitudes">
+                        <!-- Se renderiza de manera dinámica vía admin.js -->
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 20px; color: #888;">
+                                Cargando registros en tiempo real...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script src="admin.js"></script>
+</body>
+</html>
