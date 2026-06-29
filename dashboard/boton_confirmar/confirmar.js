@@ -3,12 +3,27 @@ const supabaseUrl = 'https://gguybbqqeixjqtdsmljp.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdndXliYnFxZWl4anF0ZHNtbGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3NDIxNzIsImV4cCI6MjA5ODMxODE3Mn0.d9WBBnYC9LgvoKhHzA4dl4nTiE_a06EKo48kAiujIdo';
 const clienteSupabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-// 2. VERIFICADOR DE ESTADO (Mantiene la página donde debe estar al recargar)
-document.addEventListener('DOMContentLoaded', async () => {
+// 2. VERIFICADOR DE ESTADO A PRUEBA DE BALAS (Ciclo de rastreo)
+async function verificarEstadoGuardado() {
     const idGuardado = localStorage.getItem('id_solicitud_ayuda');
-    
-    if (idGuardado) {
-        // Consultamos el estado actual y la hora exacta en la que se creó en la base de datos
+    if (!idGuardado) return; // Si es un usuario nuevo, no hacemos nada y dejamos el botón.
+
+    // Buscamos los módulos en la pantalla
+    const moduloConfirmar = document.getElementById('modulo-confirmar');
+    const moduloEspera = document.getElementById('modulo-espera');
+
+    // EL TRUCO: Si la página está un poco lenta cargando el HTML y los módulos aún no existen, 
+    // esperamos 50 milisegundos y volvemos a preguntar en bucle hasta encontrarlos.
+    if (!moduloConfirmar || !moduloEspera) {
+        setTimeout(verificarEstadoGuardado, 50);
+        return;
+    }
+
+    // Apenas los encuentra, ocultamos el botón INMEDIATAMENTE para que no parpadee ni se quede pegado
+    moduloConfirmar.style.display = 'none';
+
+    // Ahora sí, consultamos a Supabase con calma el estado real y la hora exacta
+    try {
         const { data, error } = await clienteSupabase
             .from('solicitudes_ayuda')
             .select('estatus, creado_el')
@@ -16,43 +31,45 @@ document.addEventListener('DOMContentLoaded', async () => {
             .single();
 
         if (data) {
-            // Ocultamos todo lo del inicio
+            // Nos aseguramos de que el modal de documentos esté cerrado
             const modal = document.getElementById('modal-documentos');
             if (modal) {
                 modal.classList.add('modal-oculto');
                 modal.classList.remove('modal-activo');
             }
-            document.getElementById('modulo-confirmar').style.display = 'none';
 
             if (data.estatus === 'aprobado' || data.estatus === 'finalizado') {
-                // Si ya lo aprobaste en el admin, lo mandamos directo al pago
-                document.getElementById('modulo-espera').style.display = 'none';
-                document.getElementById('modulo-pago').style.display = 'block';
+                moduloEspera.style.display = 'none';
+                const moduloPago = document.getElementById('modulo-pago');
+                if (moduloPago) moduloPago.style.display = 'block';
+                
                 if (typeof cargarModulo === 'function') {
                     cargarModulo('modulo-pago', 'formulario_pago/pago.html', 'formulario_pago/pago.css', 'formulario_pago/pago.js');
                 }
             } else {
-                // Si sigue pendiente, lo dejamos en espera y reactivamos el reloj exacto
-                document.getElementById('modulo-espera').style.display = 'block';
+                // Sigue pendiente: mostramos la espera y reactivamos el reloj desde el tiempo de la BD
+                moduloEspera.style.display = 'block';
                 iniciarContador(data.creado_el);
                 escucharAprobacionEnTiempoReal(idGuardado);
             }
         }
+    } catch (err) {
+        console.error("Error verificando el estado:", err);
     }
-});
+}
+
+// Arrancamos el verificador inmediatamente al cargar el archivo
+verificarEstadoGuardado();
 
 // 3. RELOJ INTELIGENTE (Basado en la hora real de Supabase)
 function iniciarContador(fechaRegistro) {
-    // Convertimos la hora de Supabase a milisegundos
     const tiempoInicio = new Date(fechaRegistro).getTime();
-    const duracionTotal = 10 * 60 * 1000; // 10 minutos exactos
+    const duracionTotal = 10 * 60 * 1000; 
 
-    // Buscamos el párrafo donde vamos a meter el tiempo para que actualice en pantalla
     const moduloEspera = document.getElementById('modulo-espera');
     let textoReloj = document.getElementById('texto-contador');
     
     if (!textoReloj && moduloEspera) {
-        // Si no le pusiste ID al texto en HTML, agarramos el primer párrafo dinámicamente
         const p = moduloEspera.querySelector('p');
         if (p) {
             p.id = 'texto-contador';
@@ -75,11 +92,10 @@ function iniciarContador(fechaRegistro) {
             const segundos = Math.floor((restante % (1000 * 60)) / 1000);
             
             if(textoReloj) {
-                // Esto actualiza el texto visual en tu web segundo a segundo
                 textoReloj.innerHTML = `⏳ En aproximadamente <strong>${minutos}m ${segundos}s</strong> se habilitará la opción para registrar tus datos de asignación.`;
             }
         }
-    }, 1000); // Se refresca cada segundo
+    }, 1000); 
 }
 
 // 4. ABRIR Y CERRAR EL MODAL
@@ -130,10 +146,8 @@ document.addEventListener('submit', async (e) => {
             if (error) throw error;
 
             if (data && data.length > 0) {
-                // Guardamos el ID en el teléfono de la persona
                 localStorage.setItem('id_solicitud_ayuda', data[0].id);
                 
-                // Cerramos modal y pasamos a la espera
                 const modal = document.getElementById('modal-documentos');
                 if(modal) {
                     modal.classList.add('modal-oculto');
@@ -143,10 +157,7 @@ document.addEventListener('submit', async (e) => {
                 document.getElementById('modulo-confirmar').style.display = 'none';
                 document.getElementById('modulo-espera').style.display = 'block';
 
-                // Activamos el reloj pasándole la hora exacta en la que se guardó en la BD
                 iniciarContador(data[0].creado_el);
-                
-                // Activamos el radar por si lo apruebas rápido
                 escucharAprobacionEnTiempoReal(data[0].id);
             }
 
@@ -158,7 +169,7 @@ document.addEventListener('submit', async (e) => {
     }
 });
 
-// 6. RADAR EN TIEMPO REAL (Escucha si le das "Aprobar" en el Admin)
+// 6. RADAR EN TIEMPO REAL 
 function escucharAprobacionEnTiempoReal(idSolicitud) {
     clienteSupabase
         .channel('cambios-solicitud')
