@@ -1,3 +1,12 @@
+// GUARDIA DE SEGURIDAD
+const CLAVE_ADMIN = "TU_CLAVE_AQUI"; // <--- Cambia esto por la clave que quieras
+const claveIngresada = prompt("⚠️ Acceso restringido. Introduce la clave de administrador:");
+
+if (claveIngresada !== CLAVE_ADMIN) {
+    alert("Acceso denegado.");
+    window.location.href = "../index.html"; // Te saca de ahí si la clave está mal
+}
+
 // 1. INICIALIZACIÓN
 const supabaseUrl = 'https://gguybbqqeixjqtdsmljp.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdndXliYnFxZWl4anF0ZHNtbGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3NDIxNzIsImV4cCI6MjA5ODMxODE3Mn0.d9WBBnYC9LgvoKhHzA4dl4nTiE_a06EKo48kAiujIdo';
