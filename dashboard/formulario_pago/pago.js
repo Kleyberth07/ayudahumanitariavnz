@@ -80,3 +80,4 @@ function inicializarPagoMovil() {
 
 // Arrancamos la función
 inicializarPagoMovil();
+
