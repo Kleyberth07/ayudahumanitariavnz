@@ -1,11 +1,10 @@
-// Inicialización con tus credenciales de Supabase
+// 1. INICIALIZACIÓN (Usamos clienteSupabase para no chocar con el nombre del CDN)
 const supabaseUrl = 'https://gguybbqqeixjqtdsmljp.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdndXliYnFxZWl4anF0ZHNtbGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3NDIxNzIsImV4cCI6MjA5ODMxODE3Mn0.d9WBBnYC9LgvoKhHzA4dl4nTiE_a06EKo48kAiujIdo';
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+const clienteSupabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-// 1. DELEGACIÓN DE EVENTOS PARA LOS CLICS (A prueba de fallos de carga dinámica)
+// 2. DELEGACIÓN DE EVENTOS PARA LOS CLICS
 document.addEventListener('click', (e) => {
-    // Si presionan "Confirmar Ayuda" (Abrir Modal)
     if (e.target && e.target.id === 'btn-abrir-modal') {
         const modal = document.getElementById('modal-documentos');
         if (modal) {
@@ -14,7 +13,6 @@ document.addEventListener('click', (e) => {
         }
     }
     
-    // Si presionan "Cancelar" (Cerrar Modal)
     if (e.target && e.target.id === 'btn-cerrar-modal') {
         const modal = document.getElementById('modal-documentos');
         if (modal) {
@@ -24,9 +22,8 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// 2. DELEGACIÓN DE EVENTOS PARA EL FORMULARIO
+// 3. DELEGACIÓN DE EVENTOS PARA EL FORMULARIO
 document.addEventListener('submit', async (e) => {
-    // Solo ejecutamos si el formulario que se envió es el de confirmación
     if (e.target && e.target.id === 'form-confirmacion') {
         e.preventDefault();
         
@@ -39,7 +36,8 @@ document.addEventListener('submit', async (e) => {
         const urlDireccionSimulada = "documentos/rif_pendiente.jpg";
 
         try {
-            const { data, error } = await supabase
+            // Usamos clienteSupabase en lugar de supabase
+            const { data, error } = await clienteSupabase
                 .from('solicitudes_ayuda')
                 .insert([
                     { 
@@ -54,10 +52,8 @@ document.addEventListener('submit', async (e) => {
             if (error) throw error;
 
             if (data && data.length > 0) {
-                // Guardamos el ID en el dispositivo
                 localStorage.setItem('id_solicitud_ayuda', data[0].id);
                 
-                // Ocultamos todo y pasamos al estado de espera
                 const modal = document.getElementById('modal-documentos');
                 modal.classList.add('modal-oculto');
                 modal.classList.remove('modal-activo');
@@ -65,7 +61,6 @@ document.addEventListener('submit', async (e) => {
                 document.getElementById('modulo-confirmar').style.display = 'none';
                 document.getElementById('modulo-espera').style.display = 'block';
 
-                // Activamos el radar en tiempo real
                 escucharAprobacionEnTiempoReal(data[0].id);
             }
 
@@ -77,9 +72,10 @@ document.addEventListener('submit', async (e) => {
     }
 });
 
-// 3. RADAR EN TIEMPO REAL (Escucha a Supabase)
+// 4. RADAR EN TIEMPO REAL
 function escucharAprobacionEnTiempoReal(idSolicitud) {
-    supabase
+    // Usamos clienteSupabase
+    clienteSupabase
         .channel('cambios-solicitud')
         .on('postgres_changes', { 
             event: 'UPDATE', 
@@ -91,7 +87,6 @@ function escucharAprobacionEnTiempoReal(idSolicitud) {
                 document.getElementById('modulo-espera').style.display = 'none';
                 document.getElementById('modulo-pago').style.display = 'block';
                 
-                // Cargamos el módulo de pago móvil dinámicamente
                 if (typeof cargarModulo === 'function') {
                     cargarModulo(
                         'modulo-pago', 
