@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plataforma de Asistencia Humanitaria</title>
+    <!-- Estilos Globales -->
+    <link rel="stylesheet" href="dashboard.css">
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <header class="ong-header">
+        <h1>Asistencia Humanitaria</h1>
+        <p>Portal de Registro y Asignación</p>
+    </header>
+
+    <main class="dashboard-container">
+        <!-- Contenedores donde se inyectarán los módulos dinámicamente -->
+        <div id="modulo-confirmar"></div>
+        <div id="modulo-espera" style="display: none;"></div>
+        <div id="modulo-pago" style="display: none;"></div>
+    </main>
+
+    <!-- Orquestador de Módulos -->
+    <script>
+        // Función para inyectar componentes HTML
+        async function cargarModulo(idContenedor, rutaHtml, rutaCss, rutaJs) {
+            try {
+                // Inyectar HTML
+                const respuesta = await fetch(rutaHtml);
+                const html = await respuesta.text();
+                document.getElementById(idContenedor).innerHTML = html;
+
+                // Inyectar CSS dinámico
+                if (rutaCss) {
+                    const link = document.createElement('link');
+                    link.rel = 'stylesheet';
+                    link.href = rutaCss;
+                    document.head.appendChild(link);
+                }
+
+                // Inyectar JS dinámico
+                if (rutaJs) {
+                    const script = document.createElement('script');
+                    script.src = rutaJs;
+                    script.defer = true;
+                    document.body.appendChild(script);
+                }
+            } catch (error) {
+                console.error(`Error cargando el módulo ${rutaHtml}:`, error);
+            }
+        }
+
+        // Inicializar Dashboard cargando el primer módulo
+        window.onload = () => {
+            cargarModulo(
+                'modulo-confirmar', 
+                'boton_confirmar/confirmar.html', 
+                'boton_confirmar/confirmar.css', 
+                'boton_confirmar/confirmar.js'
+            );
+            
+            // Pre-cargamos el módulo de espera (oculto por defecto)
+            cargarModulo(
+                'modulo-espera', 
+                'estado_espera/espera.html', 
+                'estado_espera/espera.css', 
+                null
+            );
+        };
+    </script>
+</body>
+                                                                         </html>
+  
