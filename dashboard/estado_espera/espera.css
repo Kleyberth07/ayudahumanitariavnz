@@ -1,0 +1,45 @@
+.tarjeta-espera {
+    background-color: var(--color-blanco);
+    padding: 30px 20px;
+    border-radius: var(--borde-radius);
+    text-align: center;
+    border-top: 5px solid var(--color-ong-secundario);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+.tarjeta-espera h3 {
+    color: var(--color-ong-primario);
+    margin: 15px 0 10px;
+}
+
+.tarjeta-espera p {
+    color: #444;
+    font-size: 1rem;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+.alerta-info {
+    background-color: #E8F4FD;
+    color: #0C5497;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+
+/* Animación del Loader */
+.loader-ong {
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid var(--color-ong-primario);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
