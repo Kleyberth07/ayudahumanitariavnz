@@ -20,6 +20,15 @@
         <div id="modulo-confirmar"></div>
         <div id="modulo-espera" style="display: none;"></div>
         <div id="modulo-pago" style="display: none;"></div>
+        
+        <!-- Módulo Final agregado para mostrar el éxito y las noticias -->
+        <div id="modulo-final" style="display:none; padding: 20px; text-align: center;">
+            <h2>✅ Registro Exitoso</h2>
+            <p>Tu información ha sido recibida. En las próximas 24 horas se realizará la asignación de la ayuda humanitaria.</p>
+            <hr>
+            <h3>Reportes y Actualidad</h3>
+            <div id="contenedor-noticias"></div>
+        </div>
     </main>
 
     <!-- Orquestador de Módulos -->
@@ -52,6 +61,15 @@
             }
         }
 
+        // Función base para evitar errores al ser llamada desde confirmar.js
+        // Aquí conectaremos la tabla de Supabase en el futuro
+        async function cargarNoticias() {
+            const contenedor = document.getElementById('contenedor-noticias');
+            if (contenedor) {
+                contenedor.innerHTML = '<p style="color: #64748B;">Cargando reportes actualizados de Venezuela...</p>';
+            }
+        }
+
         // Inicializar Dashboard cargando el primer módulo
         window.onload = () => {
             cargarModulo(
@@ -71,5 +89,4 @@
         };
     </script>
 </body>
-                                                                         </html>
-  
+</html>
