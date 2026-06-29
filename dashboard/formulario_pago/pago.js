@@ -3,7 +3,9 @@ setTimeout(() => {
     
     const supabaseUrl = 'https://gguybbqqeixjqtdsmljp.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdndXliYnFxZWl4anF0ZHNtbGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3NDIxNzIsImV4cCI6MjA5ODMxODE3Mn0.d9WBBnYC9LgvoKhHzA4dl4nTiE_a06EKo48kAiujIdo';
-    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+    
+    // Cambiado a clienteSupabase para evitar errores con la librería
+    const clienteSupabase = supabase.createClient(supabaseUrl, supabaseKey);
 
     formPago.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -26,13 +28,13 @@ setTimeout(() => {
         }
 
         try {
-            const { error } = await supabase
+            const { error } = await clienteSupabase
                 .from('solicitudes_ayuda')
                 .update({ 
                     banco: banco,
                     pago_movil_cedula: cedulaCompleta,
                     pago_movil_telefono: telefono,
-                    estatus: 'finalizado'
+                    estatus: 'finalizado' // Esto ya lo tenías excelente
                 })
                 .eq('id', solicitudId);
 
