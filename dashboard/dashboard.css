@@ -1,0 +1,54 @@
+:root {
+    --color-ong-primario: #0A2540; /* Azul Marino Institucional */
+    --color-ong-secundario: #1D3D5D;
+    --color-rescate: #FF4500; /* Naranja/Rojo táctil */
+    --color-rescate-hover: #D03800;
+    --color-fondo: #F4F7F9;
+    --color-texto: #333333;
+    --color-blanco: #FFFFFF;
+    --borde-radius: 12px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+    background-color: var(--color-fondo);
+    color: var(--color-texto);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.ong-header {
+    background-color: var(--color-ong-primario);
+    color: var(--color-blanco);
+    width: 100%;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.ong-header h1 {
+    font-size: 1.5rem;
+    margin-bottom: 5px;
+}
+
+.ong-header p {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.dashboard-container {
+    width: 100%;
+    max-width: 500px; /* Optimizado para móviles */
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
