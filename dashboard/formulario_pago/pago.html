@@ -1,0 +1,40 @@
+<div class="tarjeta-pago animate-slide-in">
+    <div class="pago-header">
+        <span class="badge-aprobado">✓ Identidad Verificada</span>
+        <h2>Asignación de Ayuda</h2>
+        <p>Introduce tus datos de Pago Móvil para procesar la transferencia humanitaria de emergencia.</p>
+    </div>
+
+    <form id="form-pago-movil">
+        <div class="form-group">
+            <label for="pago-banco">Banco Destino</label>
+            <select id="pago-banco" required>
+                <option value="" disabled selected>Selecciona un banco</option>
+                <option value="0102 - Banco de Venezuela">Banco de Venezuela</option>
+                <option value="0134 - Banesco">Banesco</option>
+                <option value="0105 - Mercantil">Mercantil</option>
+                <option value="0108 - Provincial">Provincial</option>
+                <option value="0172 - Bancamiga">Bancamiga</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="pago-cedula">Cédula del Titular</label>
+            <div class="input-cedula-container">
+                <select id="pago-tipo-cedula" style="width: 30%; margin-right: 5px;">
+                    <option value="V">V-</option>
+                    <option value="E">E-</option>
+                </select>
+                <input type="number" id="pago-cedula" placeholder="Ej. 25123456" required style="width: 70%;">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="pago-telefono">Teléfono Afiliado</label>
+            <input type="tel" id="pago-telefono" placeholder="Ej. 04121234567" pattern="[0-9]{11}" required>
+            <small class="ayuda-input">Deben ser exactamente 11 dígitos numéricos.</small>
+        </div>
+
+        <button type="submit" id="btn-enviar-pago" class="btn-pago-enviar">Solicitar Transferencia</button>
+    </form>
+</div>
