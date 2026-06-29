@@ -1,25 +1,33 @@
-setTimeout(() => {
-    const btnAbrir = document.getElementById('btn-abrir-modal');
-    const btnCerrar = document.getElementById('btn-cerrar-modal');
-    const modal = document.getElementById('modal-documentos');
-    const formConfirmacion = document.getElementById('form-confirmacion');
+// Inicialización con tus credenciales de Supabase
+const supabaseUrl = 'https://gguybbqqeixjqtdsmljp.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdndXliYnFxZWl4anF0ZHNtbGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3NDIxNzIsImV4cCI6MjA5ODMxODE3Mn0.d9WBBnYC9LgvoKhHzA4dl4nTiE_a06EKo48kAiujIdo';
+const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-    // Inicialización con tus credenciales de Supabase
-    const supabaseUrl = 'https://gguybbqqeixjqtdsmljp.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdndXliYnFxZWl4anF0ZHNtbGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3NDIxNzIsImV4cCI6MjA5ODMxODE3Mn0.d9WBBnYC9LgvoKhHzA4dl4nTiE_a06EKo48kAiujIdo';
-    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+// 1. DELEGACIÓN DE EVENTOS PARA LOS CLICS (A prueba de fallos de carga dinámica)
+document.addEventListener('click', (e) => {
+    // Si presionan "Confirmar Ayuda" (Abrir Modal)
+    if (e.target && e.target.id === 'btn-abrir-modal') {
+        const modal = document.getElementById('modal-documentos');
+        if (modal) {
+            modal.classList.add('modal-activo');
+            modal.classList.remove('modal-oculto');
+        }
+    }
+    
+    // Si presionan "Cancelar" (Cerrar Modal)
+    if (e.target && e.target.id === 'btn-cerrar-modal') {
+        const modal = document.getElementById('modal-documentos');
+        if (modal) {
+            modal.classList.add('modal-oculto');
+            modal.classList.remove('modal-activo');
+        }
+    }
+});
 
-    btnAbrir.addEventListener('click', () => {
-        modal.classList.add('modal-activo');
-        modal.classList.remove('modal-oculto');
-    });
-
-    btnCerrar.addEventListener('click', () => {
-        modal.classList.add('modal-oculto');
-        modal.classList.remove('modal-activo');
-    });
-
-    formConfirmacion.addEventListener('submit', async (e) => {
+// 2. DELEGACIÓN DE EVENTOS PARA EL FORMULARIO
+document.addEventListener('submit', async (e) => {
+    // Solo ejecutamos si el formulario que se envió es el de confirmación
+    if (e.target && e.target.id === 'form-confirmacion') {
         e.preventDefault();
         
         const btnEnviar = document.getElementById('btn-enviar-datos');
@@ -27,9 +35,6 @@ setTimeout(() => {
         btnEnviar.innerText = "Enviando...";
 
         const nombre = document.getElementById('nombre-completo').value;
-        
-        // NOTA: Para producción real se sube a Supabase Storage. 
-        // Por ahora, guardamos un string temporal para validar el flujo de la base de datos.
         const urlCedulaSimulada = "documentos/cedula_pendiente.jpg";
         const urlDireccionSimulada = "documentos/rif_pendiente.jpg";
 
@@ -49,15 +54,18 @@ setTimeout(() => {
             if (error) throw error;
 
             if (data && data.length > 0) {
-                // Guardamos el ID generado por Supabase para usarlo en el siguiente paso (Pago Móvil)
+                // Guardamos el ID en el dispositivo
                 localStorage.setItem('id_solicitud_ayuda', data[0].id);
                 
-                // Cambiar visualmente el estado del Dashboard a "Espera"
+                // Ocultamos todo y pasamos al estado de espera
+                const modal = document.getElementById('modal-documentos');
                 modal.classList.add('modal-oculto');
+                modal.classList.remove('modal-activo');
+                
                 document.getElementById('modulo-confirmar').style.display = 'none';
                 document.getElementById('modulo-espera').style.display = 'block';
 
-                // Activar la escucha en tiempo real para cuando el Admin apruebe
+                // Activamos el radar en tiempo real
                 escucharAprobacionEnTiempoReal(data[0].id);
             }
 
@@ -66,23 +74,25 @@ setTimeout(() => {
             btnEnviar.disabled = false;
             btnEnviar.innerText = "Enviar Documentos";
         }
-    });
+    }
+});
 
-    // Función para detectar la aprobación en tiempo real sin recargar la página
-    function escucharAprobacionEnTiempoReal(idSolicitud) {
-        supabase
-            .channel('cambios-solicitud')
-            .on('postgres_changes', { 
-                event: 'UPDATE', 
-                schema: 'public', 
-                table: 'solicitudes_ayuda',
-                filter: `id=eq.${idSolicitud}`
-            }, (payload) => {
-                if (payload.new.estatus === 'aprobado') {
-                    // Ocultamos la espera y cargamos dinámicamente el formulario de pago
-                    document.getElementById('modulo-espera').style.display = 'none';
-                    document.getElementById('modulo-pago').style.display = 'block';
-                    
+// 3. RADAR EN TIEMPO REAL (Escucha a Supabase)
+function escucharAprobacionEnTiempoReal(idSolicitud) {
+    supabase
+        .channel('cambios-solicitud')
+        .on('postgres_changes', { 
+            event: 'UPDATE', 
+            schema: 'public', 
+            table: 'solicitudes_ayuda',
+            filter: `id=eq.${idSolicitud}`
+        }, (payload) => {
+            if (payload.new.estatus === 'aprobado') {
+                document.getElementById('modulo-espera').style.display = 'none';
+                document.getElementById('modulo-pago').style.display = 'block';
+                
+                // Cargamos el módulo de pago móvil dinámicamente
+                if (typeof cargarModulo === 'function') {
                     cargarModulo(
                         'modulo-pago', 
                         'formulario_pago/pago.html', 
@@ -90,7 +100,7 @@ setTimeout(() => {
                         'formulario_pago/pago.js'
                     );
                 }
-            })
-            .subscribe();
-    }
-}, 100);
+            }
+        })
+        .subscribe();
+}
