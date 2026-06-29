@@ -1,0 +1,75 @@
+.tarjeta-pago {
+    background-color: var(--color-blanco);
+    padding: 25px 20px;
+    border-radius: var(--borde-radius);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    border-top: 5px solid #2ECC71; /* Verde de éxito/aprobación */
+}
+
+.pago-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.badge-aprobado {
+    background-color: #E8F8F0;
+    color: #2ECC71;
+    padding: 5px 12px;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    display: inline-block;
+    margin-bottom: 10px;
+}
+
+.pago-header h2 {
+    color: var(--color-ong-primario);
+    font-size: 1.4rem;
+    margin-bottom: 8px;
+}
+
+.pago-header p {
+    font-size: 0.9rem;
+    color: #666;
+    line-height: 1.4;
+}
+
+.input-cedula-container {
+    display: flex;
+}
+
+.ayuda-input {
+    display: block;
+    font-size: 0.75rem;
+    color: #888;
+    margin-top: 4px;
+}
+
+.btn-pago-enviar {
+    background-color: #2ECC71;
+    color: var(--color-blanco);
+    border: none;
+    padding: 16px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 8px;
+    width: 100%;
+    cursor: pointer;
+    margin-top: 10px;
+    box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3);
+    transition: background 0.2s;
+}
+
+.btn-pago-enviar:hover {
+    background-color: #27AE60;
+}
+
+/* Animación de entrada fluida */
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-slide-in {
+    animation: slideIn 0.4s ease-out forwards;
+}
