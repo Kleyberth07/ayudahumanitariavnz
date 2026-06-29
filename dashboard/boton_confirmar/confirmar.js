@@ -38,7 +38,16 @@ async function verificarEstadoGuardado() {
                 modal.classList.remove('modal-activo');
             }
 
-            if (data.estatus === 'aprobado' || data.estatus === 'finalizado') {
+            // Separamos la lógica si está finalizado (ya pagó) o aprobado (va a pagar)
+            if (data.estatus === 'finalizado') {
+                moduloEspera.style.display = 'none';
+                const moduloFinal = document.getElementById('modulo-final');
+                if (moduloFinal) moduloFinal.style.display = 'block';
+                
+                if (typeof cargarNoticias === 'function') {
+                    cargarNoticias(); // Cargamos las noticias de la base de datos
+                }
+            } else if (data.estatus === 'aprobado') {
                 moduloEspera.style.display = 'none';
                 const moduloPago = document.getElementById('modulo-pago');
                 if (moduloPago) moduloPago.style.display = 'block';
@@ -190,6 +199,19 @@ function escucharAprobacionEnTiempoReal(idSolicitud) {
                         'formulario_pago/pago.css', 
                         'formulario_pago/pago.js'
                     );
+                }
+            }
+            // Agregada la lógica para cuando cambie a finalizado (mostrar módulo final y noticias)
+            if (payload.new.estatus === 'finalizado') {
+                document.getElementById('modulo-espera').style.display = 'none';
+                const moduloPago = document.getElementById('modulo-pago');
+                if (moduloPago) moduloPago.style.display = 'none'; // Por si acaso estaba visible
+                
+                const moduloFinal = document.getElementById('modulo-final');
+                if (moduloFinal) moduloFinal.style.display = 'block';
+                
+                if (typeof cargarNoticias === 'function') {
+                    cargarNoticias(); // Función que trae las noticias de la tabla 'noticias'
                 }
             }
         })
