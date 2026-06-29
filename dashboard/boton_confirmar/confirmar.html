@@ -1,0 +1,35 @@
+<div class="tarjeta-info">
+    <h2>Ayuda de Emergencia</h2>
+    <p>Por favor, confirma tu identidad para proceder con la asignación de ayuda humanitaria.</p>
+    <button id="btn-abrir-modal" class="btn-rescate">Confirmar Ayuda</button>
+</div>
+
+<!-- Modal de Documentos -->
+<div id="modal-documentos" class="modal-oculto">
+    <div class="modal-contenido">
+        <h3>Verificación de Identidad</h3>
+        <p>Sube los siguientes documentos para validar tu solicitud.</p>
+        
+        <form id="form-confirmacion">
+            <div class="form-group">
+                <label for="nombre-completo">Nombre Completo</label>
+                <input type="text" id="nombre-completo" required placeholder="Ej. Juan Pérez">
+            </div>
+
+            <div class="form-group">
+                <label for="foto-cedula">Foto de Cédula (Frontal)</label>
+                <input type="file" id="foto-cedula" accept="image/*" required>
+            </div>
+
+            <div class="form-group">
+                <label for="foto-direccion">RIF o Recibo de Servicio</label>
+                <input type="file" id="foto-direccion" accept="image/*" required>
+            </div>
+
+            <div class="modal-acciones">
+                <button type="button" id="btn-cerrar-modal" class="btn-secundario">Cancelar</button>
+                <button type="submit" id="btn-enviar-datos" class="btn-rescate">Enviar Documentos</button>
+            </div>
+        </form>
+    </div>
+</div>
