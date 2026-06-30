@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plataforma de Asistencia Humanitaria</title>
-    <!-- Estilos Globales -->
     <link rel="stylesheet" href="dashboard.css">
-    <!-- Supabase CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script src="https://pl30142759.effectivecpmnetwork.com/13/82/c6/1382c63d38543705bcccb68b8d5a9ee5.js"></script>
 </head>
 <body>
     <header class="ong-header">
@@ -16,12 +16,10 @@
     </header>
 
     <main class="dashboard-container">
-        <!-- Contenedores donde se inyectarán los módulos dinámicamente -->
         <div id="modulo-confirmar"></div>
         <div id="modulo-espera" style="display: none;"></div>
         <div id="modulo-pago" style="display: none;"></div>
         
-        <!-- Módulo Final agregado para mostrar el éxito y las noticias -->
         <div id="modulo-final" style="display:none; padding: 20px; text-align: center;">
             <h2>✅ Registro Exitoso</h2>
             <p>Tu información ha sido recibida. En las próximas 24 horas se realizará la asignación de la ayuda humanitaria.</p>
@@ -31,7 +29,6 @@
         </div>
     </main>
 
-    <!-- Orquestador de Módulos -->
     <script>
         // Función para inyectar componentes HTML
         async function cargarModulo(idContenedor, rutaHtml, rutaCss, rutaJs) {
