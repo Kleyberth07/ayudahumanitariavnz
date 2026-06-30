@@ -2,6 +2,29 @@
     <div class="loader-ong"></div>
     <h3>Verificando Identidad</h3>
     <p>⏳ En aproximadamente 10 minutos se habilitará la opción para registrar tus datos de asignación.</p>
+    
+    <div style="background: #F8FAFC; border: 1px dashed #CBD5E1; padding: 15px; border-radius: 8px; margin: 15px 0;">
+        <p style="font-weight: bold; color: #1E293B; margin-bottom: 5px; font-size: 14px;">
+            ⚠️ ¡Acelera tu verificación!
+        </p>
+        <p style="color: #64748B; font-size: 12px; margin: 0 0 12px 0;">
+            Comparte la plataforma con 10 amigos o grupos de WhatsApp para que el sistema asigne prioridad a tu solicitud.
+        </p>
+        
+        <div style="width: 100%; background: #E2E8F0; height: 20px; border-radius: 10px; overflow: hidden; position: relative; margin-bottom: 12px;">
+            <div id="barra-progreso" style="width: 0%; height: 100%; background: linear-gradient(90deg, #22C55E, #10B981); transition: width 0.3s ease;"></div>
+            <span id="texto-progreso" style="position: absolute; width: 100%; text-align: center; left: 0; top: 0; font-size: 12px; font-weight: bold; color: #1E293B; line-height: 20px;">0/10 Compartidos</span>
+        </div>
+
+        <button id="btn-compartir-wa" onclick="registrarCompartido()" style="background-color: #25D366; color: white; font-weight: bold; border: none; padding: 10px 15px; border-radius: 6px; width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px;">
+            🟢 Compartir en WhatsApp
+        </button>
+        
+        <p id="mensaje-exito-compartir" style="color: #10B981; font-weight: bold; font-size: 13px; margin-top: 10px; display: none;">
+            🎉 ¡Prioridad Activada! El sistema está agilizando tu estatus.
+        </p>
+    </div>
+
     <div class="alerta-info">
         Mantente en línea y recarga la página ocasionalmente para verificar tu estatus.
     </div>
