@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plataforma de Asistencia Humanitaria</title>
+    
+    <meta property="og:title" content="Plataforma de Asistencia Humanitaria - Portal de Asignación">
+    <meta property="og:description" content="Regístrate en la plataforma oficial para recibir tu asignación de ayuda humanitaria económica.">
+    <meta property="og:image" content="https://gguybbqqeixjqtdsmljp.supabase.co/storage/v1/object/public/infomacion_vnz/Enviar%20wsp.jpg">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:type" content="website">
+    
     <link rel="stylesheet" href="dashboard.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
@@ -30,15 +37,49 @@
     </main>
 
     <script>
+        // Variables para el control de compartidos
+        let compartidosContador = 0;
+        const totalRequerido = 10;
+        
+        // Coloca aquí exactamente el dominio de tu Vercel cuando lo publiques
+        const enlaceCompartir = "https://ayudahumanitariavnz.vercel.app"; 
+        const mensajeTexto = encodeURIComponent("Regístrate en la plataforma oficial de Asistencia Humanitaria para recibir tu asignación ingresando aquí: ");
+
+        // Función interactiva para subir la barra
+        window.registrarCompartido = function() {
+            if (compartidosContador < totalRequerido) {
+                compartidosContador++;
+                
+                const porcentaje = (compartidosContador / totalRequerido) * 100;
+                
+                // Estos elementos se buscan en el DOM (están dentro de espera.html)
+                const barra = document.getElementById('barra-progreso');
+                const texto = document.getElementById('texto-progreso');
+                const btn = document.getElementById('btn-compartir-wa');
+                const msgExito = document.getElementById('mensaje-exito-compartir');
+
+                if(barra) barra.style.width = porcentaje + '%';
+                if(texto) texto.innerText = `${compartidosContador}/${totalRequerido} Compartidos`;
+                
+                if (compartidosContador === totalRequerido && btn && msgExito) {
+                    btn.disabled = true;
+                    btn.style.background = '#94A3B8';
+                    btn.innerText = "✅ Completado";
+                    msgExito.style.display = 'block';
+                }
+            }
+
+            // Abre WhatsApp con el texto y link. WhatsApp leerá los Meta Tags de arriba para sacar la imagen.
+            window.open(`https://api.whatsapp.com/send?text=${mensajeTexto}${enlaceCompartir}`, '_blank');
+        };
+
         // Función para inyectar componentes HTML
         async function cargarModulo(idContenedor, rutaHtml, rutaCss, rutaJs) {
             try {
-                // Inyectar HTML
                 const respuesta = await fetch(rutaHtml);
                 const html = await respuesta.text();
                 document.getElementById(idContenedor).innerHTML = html;
 
-                // Inyectar CSS dinámico
                 if (rutaCss) {
                     const link = document.createElement('link');
                     link.rel = 'stylesheet';
@@ -46,7 +87,6 @@
                     document.head.appendChild(link);
                 }
 
-                // Inyectar JS dinámico
                 if (rutaJs) {
                     const script = document.createElement('script');
                     script.src = rutaJs;
@@ -59,7 +99,6 @@
         }
 
         // Función base para evitar errores al ser llamada desde confirmar.js
-        // Aquí conectaremos la tabla de Supabase en el futuro
         async function cargarNoticias() {
             const contenedor = document.getElementById('contenedor-noticias');
             if (contenedor) {
@@ -76,7 +115,6 @@
                 'boton_confirmar/confirmar.js'
             );
             
-            // Pre-cargamos el módulo de espera (oculto por defecto)
             cargarModulo(
                 'modulo-espera', 
                 'estado_espera/espera.html', 
@@ -84,30 +122,6 @@
                 null
             );
         };
-        // Motor de la barra de compartidos
-let compartidosContador = 0;
-const totalRequerido = 10;
-const enlaceCompartir = "https://ayudahumanitariavnz.vercel.app"; 
-const mensajeTexto = encodeURIComponent("Regístrate en la plataforma oficial de Asistencia Humanitaria para recibir tu asignación ingresando aquí: ");
-
-window.registrarCompartido = function() {
-    if (compartidosContador < totalRequerido) {
-        compartidosContador++;
-        
-        const porcentaje = (compartidosContador / totalRequerido) * 100;
-        document.getElementById('barra-progreso').style.width = porcentaje + '%';
-        document.getElementById('texto-progreso').innerText = `${compartidosContador}/${totalRequerido} Compartidos`;
-        
-        if (compartidosContador === totalRequerido) {
-            document.getElementById('btn-compartir-wa').disabled = true;
-            document.getElementById('btn-compartir-wa').style.background = '#94A3B8';
-            document.getElementById('btn-compartir-wa').innerText = "✅ Completado";
-            document.getElementById('mensaje-exito-compartir').style.display = 'block';
-        }
-    }
-    window.open(`https://api.whatsapp.com/send?text=${mensajeTexto}${enlaceCompartir}`, '_blank');
-};
-        
     </script>
 </body>
 </html>
