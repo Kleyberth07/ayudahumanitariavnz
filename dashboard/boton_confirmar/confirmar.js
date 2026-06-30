@@ -6,25 +6,20 @@ const clienteSupabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 // 2. VERIFICADOR DE ESTADO A PRUEBA DE BALAS (Ciclo de rastreo)
 async function verificarEstadoGuardado() {
     const idGuardado = localStorage.getItem('id_solicitud_ayuda');
-    if (!idGuardado) return; // Si es un usuario nuevo, no hacemos nada y dejamos el botón.
+    if (!idGuardado) return; 
 
-    // Buscamos los módulos en la pantalla
     const moduloConfirmar = document.getElementById('modulo-confirmar');
     const moduloEspera = document.getElementById('modulo-espera');
     const moduloPago = document.getElementById('modulo-pago');
     const moduloFinal = document.getElementById('modulo-final');
 
-    // EL TRUCO: Si la página está un poco lenta cargando el HTML y los módulos aún no existen, 
-    // esperamos 50 milisegundos y volvemos a preguntar en bucle hasta encontrarlos.
     if (!moduloConfirmar || !moduloEspera) {
         setTimeout(verificarEstadoGuardado, 50);
         return;
     }
 
-    // Apenas los encuentra, ocultamos el botón INMEDIATAMENTE para que no parpadee ni se quede pegado
     moduloConfirmar.style.display = 'none';
 
-    // Ahora sí, consultamos a Supabase con calma el estado real y la hora exacta
     try {
         const { data, error } = await clienteSupabase
             .from('solicitudes_ayuda')
@@ -33,25 +28,21 @@ async function verificarEstadoGuardado() {
             .single();
 
         if (data) {
-            // Nos aseguramos de que el modal de documentos esté cerrado
             const modal = document.getElementById('modal-documentos');
             if (modal) {
                 modal.classList.add('modal-oculto');
                 modal.classList.remove('modal-activo');
             }
 
-            // Separamos la lógica según el estado en la base de datos
             if (data.estatus === 'finalizado') {
-                // Ya envió sus datos para recibir la ayuda. Ocultamos TODO excepto el final.
                 moduloEspera.style.display = 'none';
-                if (moduloPago) moduloPago.style.display = 'none'; // ¡CLAVE PARA ROMPER EL BUCLE!
+                if (moduloPago) moduloPago.style.display = 'none'; 
                 if (moduloFinal) moduloFinal.style.display = 'block';
                 
                 if (typeof cargarNoticias === 'function') {
-                    cargarNoticias(); // Cargamos las noticias de la base de datos
+                    cargarNoticias(); 
                 }
             } else if (data.estatus === 'aprobado') {
-                // Tú le aprobaste la ayuda, ahora le toca enviar sus datos.
                 moduloEspera.style.display = 'none';
                 if (moduloPago) moduloPago.style.display = 'block';
                 
@@ -59,7 +50,6 @@ async function verificarEstadoGuardado() {
                     cargarModulo('modulo-pago', 'formulario_pago/pago.html', 'formulario_pago/pago.css', 'formulario_pago/pago.js');
                 }
             } else {
-                // Sigue pendiente: mostramos la espera y reactivamos el reloj desde el tiempo de la BD
                 moduloEspera.style.display = 'block';
                 iniciarContador(data.creado_el);
                 escucharAprobacionEnTiempoReal(idGuardado);
@@ -70,7 +60,6 @@ async function verificarEstadoGuardado() {
     }
 }
 
-// Arrancamos el verificador inmediatamente al cargar el archivo
 verificarEstadoGuardado();
 
 // 3. RELOJ INTELIGENTE (Basado en la hora real de Supabase)
@@ -129,28 +118,44 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// 5. GUARDAR DATOS POR PRIMERA VEZ
+// 5. CIRUGÍA INTERNA: GUARDAR DATOS DE TEXTO PLANO POR PRIMERA VEZ
 document.addEventListener('submit', async (e) => {
     if (e.target && e.target.id === 'form-confirmacion') {
         e.preventDefault();
         
         const btnEnviar = document.getElementById('btn-enviar-datos');
         btnEnviar.disabled = true;
-        btnEnviar.innerText = "Enviando...";
+        btnEnviar.innerText = "Registrando...";
 
-        const nombre = document.getElementById('nombre-completo').value;
-        const urlCedulaSimulada = "documentos/cedula_pendiente.jpg";
-        const urlDireccionSimulada = "documentos/rif_pendiente.jpg";
+        // Capturamos el contenido de las nuevas casillas limpias
+        const primerNombre = document.getElementById('reg-primer-nombre').value.trim();
+        const segundoNombre = document.getElementById('reg-segundo-nombre').value.trim();
+        const primerApellido = document.getElementById('reg-primer-apellido').value.trim();
+        const segundoApellido = document.getElementById('reg-segundo-apellido').value.trim();
+        
+        // Unificamos el formato completo para mantener compatibilidad con tu columna original
+        const nombreCompleto = `${primerNombre} ${segundoNombre} ${primerApellido} ${segundoApellido}`.replace(/\s+/g, ' ').trim();
+        
+        const cedula = document.getElementById('reg-cedula').value.trim();
+        const direccion = document.getElementById('reg-direccion').value.trim();
+        const ciudad = document.getElementById('reg-ciudad').value.trim();
+        const estado = document.getElementById('reg-estado').value.trim();
 
         try {
             const { data, error } = await clienteSupabase
                 .from('solicitudes_ayuda')
                 .insert([
                     { 
-                        nombre_completo: nombre,
+                        nombre_completo: nombreCompleto,
+                        nombres: `${primerNombre} ${segundoNombre}`.trim(),
+                        apellidos: `${primerApellido} ${segundoApellido}`.trim(),
+                        cedula: cedula,
+                        direccion: direccion,
+                        ciudad: ciudad,
+                        estado: estado,
                         estatus: 'pendiente',
-                        url_cedula: urlCedulaSimulada,
-                        url_direccion: urlDireccionSimulada
+                        url_cedula: 'texto_plano', // Indicadores comodín para no alterar la estructura obligatoria de la tabla
+                        url_direccion: 'texto_plano'
                     }
                 ])
                 .select();
@@ -176,7 +181,7 @@ document.addEventListener('submit', async (e) => {
         } catch (err) {
             alert("Error al registrar solicitud: " + err.message);
             btnEnviar.disabled = false;
-            btnEnviar.innerText = "Enviar Documentos";
+            btnEnviar.innerText = "Confirmar Registro";
         }
     }
 });
@@ -204,20 +209,17 @@ function escucharAprobacionEnTiempoReal(idSolicitud) {
                     );
                 }
             }
-            // Lógica cuando envían sus datos para que tú pagues
             if (payload.new.estatus === 'finalizado') {
                 document.getElementById('modulo-espera').style.display = 'none';
                 
-                // Ocultamos el formulario de pago
                 const moduloPago = document.getElementById('modulo-pago');
                 if (moduloPago) moduloPago.style.display = 'none'; 
                 
-                // Mostramos el dashboard final
                 const moduloFinal = document.getElementById('modulo-final');
                 if (moduloFinal) moduloFinal.style.display = 'block';
                 
                 if (typeof cargarNoticias === 'function') {
-                    cargarNoticias(); // Función que trae las noticias
+                    cargarNoticias(); 
                 }
             }
         })
