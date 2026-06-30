@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Control Humanitario - Admin</title>
     <link rel="stylesheet" href="admin.css">
-    <!-- Supabase CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -46,7 +45,6 @@
                         </tr>
                     </thead>
                     <tbody id="lista-solicitudes">
-                        <!-- Se renderiza de manera dinámica vía admin.js -->
                         <tr>
                             <td colspan="5" style="text-align: center; padding: 20px; color: #888;">
                                 Cargando registros en tiempo real...
@@ -57,7 +55,6 @@
             </div>
         </section>
 
-        <!-- CIRUGÍA: Formulario integrado para conectar con la lógica existente de admin.js -->
         <section class="tabla-contenedor" style="margin-top: 20px; padding: 20px;">
             <h3 style="margin-top: 0; margin-bottom: 15px;">📢 Publicar Nuevo Reporte / Noticia</h3>
             <form id="form-publicar-noticia">
@@ -75,6 +72,13 @@
                 </div>
                 <button type="submit" style="background-color:#10B981; color:white; font-weight:bold; padding:10px 20px; border:none; border-radius:4px; cursor:pointer; width:100%;">Publicar Reporte</button>
             </form>
+
+            <hr style="margin: 25px 0; border: 0; border-top: 1px solid #E2E8F0;">
+
+            <h3 style="color: #1E293B; margin-bottom: 15px;">🗂️ Historial y Control de Reportes Publicados</h3>
+            <div id="lista-gestion-noticias" style="display: flex; flex-direction: column; gap: 10px;">
+                <p style="color: #888; font-style: italic;">Cargando reportes publicados...</p>
+            </div>
         </section>
     </main>
 
