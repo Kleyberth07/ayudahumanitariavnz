@@ -1,5 +1,5 @@
 // GUARDIA DE SEGURIDAD
-const CLAVE_ADMIN = "TU_CLAVE_AQUI"; // <--- Cambia esto por la clave que quieras
+const CLAVE_ADMIN = "Kley.1234#"; // <--- Cambia esto por la clave que quieras
 const claveIngresada = prompt("⚠️ Acceso restringido. Introduce la clave de administrador:");
 
 if (claveIngresada !== CLAVE_ADMIN) {
@@ -14,9 +14,13 @@ const clienteSupabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 document.addEventListener('DOMContentLoaded', () => {
     fetchSolicitudes();
+    fetchGestionNoticias(); // CIRUGÍA: Cargar lista de noticias al entrar
     
     const btnRefrescar = document.getElementById('btn-refrescar');
-    if (btnRefrescar) btnRefrescar.addEventListener('click', fetchSolicitudes);
+    if (btnRefrescar) btnRefrescar.addEventListener('click', () => {
+        fetchSolicitudes();
+        fetchGestionNoticias(); // CIRUGÍA: Refrescar noticias también
+    });
     
     const formNoticia = document.getElementById('form-publicar-noticia');
     if (formNoticia) {
@@ -163,6 +167,7 @@ async function publicarNoticia(e) {
 
         alert("¡Reporte oficial publicado con éxito!");
         document.getElementById('form-publicar-noticia').reset();
+        fetchGestionNoticias(); // CIRUGÍA: Actualiza la lista al publicar
     } catch (err) {
         alert("Error al publicar noticia: " + err.message);
     } finally {
@@ -172,3 +177,60 @@ async function publicarNoticia(e) {
         }
     }
 }
+
+// CIRUGÍA: 8. TRAER TODAS LAS NOTICIAS AL PANEL DE ADMINISTRADOR
+async function fetchGestionNoticias() {
+    const contenedor = document.getElementById('lista-gestion-noticias');
+    if (!contenedor) return;
+
+    try {
+        const { data: noticias, error } = await clienteSupabase
+            .from('noticias')
+            .select('*')
+            .order('creado_el', { ascending: false });
+
+        if (error) throw error;
+
+        if (!noticias || noticias.length === 0) {
+            contenedor.innerHTML = '<p style="color:#64748B; font-style:italic;">No hay reportes publicados en la base de datos.</p>';
+            return;
+        }
+
+        contenedor.innerHTML = '';
+        noticias.forEach(item => {
+            const div = document.createElement('div');
+            div.style.cssText = "display:flex; justify-content:space-between; align-items:center; background:#F8FAFC; padding:12px; border:1px solid #E2E8F0; border-radius:6px; gap:10px;";
+            
+            div.innerHTML = `
+                <div style="flex:1;">
+                    <h4 style="margin:0 0 4px 0; color:#1E293B; font-size:14px;">${item.titulo}</h4>
+                    <p style="margin:0; color:#64748B; font-size:12px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${item.contenido}</p>
+                </div>
+                <button onclick="eliminarNoticiaDesdeAdmin('${item.id}')" style="background:#EF4444; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:12px; flex-shrink:0;">Eliminar</button>
+            `;
+            contenedor.appendChild(div);
+        });
+
+    } catch (err) {
+        console.error("Error listando noticias en panel:", err.message);
+    }
+}
+
+// CIRUGÍA: 9. ELIMINAR NOTICIA DESDE EL PANEL
+window.eliminarNoticiaDesdeAdmin = async function(id) {
+    if (!confirm("⚠️ ¿Estás seguro de que quieres eliminar este reporte del sistema? Desaparecerá de la vista de los usuarios.")) return;
+
+    try {
+        const { error } = await clienteSupabase
+            .from('noticias')
+            .delete()
+            .eq('id', id);
+
+        if (error) throw error;
+        alert("Reporte eliminado correctamente.");
+        fetchGestionNoticias(); // Refresca la lista de noticias tras borrar
+    } catch (err) {
+        alert("Error al eliminar el reporte: " + err.message);
+    }
+               }
+            
