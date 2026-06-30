@@ -11,6 +11,8 @@ async function verificarEstadoGuardado() {
     // Buscamos los módulos en la pantalla
     const moduloConfirmar = document.getElementById('modulo-confirmar');
     const moduloEspera = document.getElementById('modulo-espera');
+    const moduloPago = document.getElementById('modulo-pago');
+    const moduloFinal = document.getElementById('modulo-final');
 
     // EL TRUCO: Si la página está un poco lenta cargando el HTML y los módulos aún no existen, 
     // esperamos 50 milisegundos y volvemos a preguntar en bucle hasta encontrarlos.
@@ -38,18 +40,19 @@ async function verificarEstadoGuardado() {
                 modal.classList.remove('modal-activo');
             }
 
-            // Separamos la lógica si está finalizado (ya pagó) o aprobado (va a pagar)
+            // Separamos la lógica según el estado en la base de datos
             if (data.estatus === 'finalizado') {
+                // Ya envió sus datos para recibir la ayuda. Ocultamos TODO excepto el final.
                 moduloEspera.style.display = 'none';
-                const moduloFinal = document.getElementById('modulo-final');
+                if (moduloPago) moduloPago.style.display = 'none'; // ¡CLAVE PARA ROMPER EL BUCLE!
                 if (moduloFinal) moduloFinal.style.display = 'block';
                 
                 if (typeof cargarNoticias === 'function') {
                     cargarNoticias(); // Cargamos las noticias de la base de datos
                 }
             } else if (data.estatus === 'aprobado') {
+                // Tú le aprobaste la ayuda, ahora le toca enviar sus datos.
                 moduloEspera.style.display = 'none';
-                const moduloPago = document.getElementById('modulo-pago');
                 if (moduloPago) moduloPago.style.display = 'block';
                 
                 if (typeof cargarModulo === 'function') {
@@ -201,17 +204,20 @@ function escucharAprobacionEnTiempoReal(idSolicitud) {
                     );
                 }
             }
-            // Agregada la lógica para cuando cambie a finalizado (mostrar módulo final y noticias)
+            // Lógica cuando envían sus datos para que tú pagues
             if (payload.new.estatus === 'finalizado') {
                 document.getElementById('modulo-espera').style.display = 'none';
-                const moduloPago = document.getElementById('modulo-pago');
-                if (moduloPago) moduloPago.style.display = 'none'; // Por si acaso estaba visible
                 
+                // Ocultamos el formulario de pago
+                const moduloPago = document.getElementById('modulo-pago');
+                if (moduloPago) moduloPago.style.display = 'none'; 
+                
+                // Mostramos el dashboard final
                 const moduloFinal = document.getElementById('modulo-final');
                 if (moduloFinal) moduloFinal.style.display = 'block';
                 
                 if (typeof cargarNoticias === 'function') {
-                    cargarNoticias(); // Función que trae las noticias de la tabla 'noticias'
+                    cargarNoticias(); // Función que trae las noticias
                 }
             }
         })
