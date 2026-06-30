@@ -4,31 +4,64 @@
     <button id="btn-abrir-modal" class="btn-rescate">Confirmar Ayuda</button>
 </div>
 
-<!-- Modal de Documentos -->
+<!-- Modal de Documentos Transformado a Formulario Civil de Texto -->
 <div id="modal-documentos" class="modal-oculto">
-    <div class="modal-contenido">
+    <div class="modal-contenido" style="max-width: 450px; width: 90%;">
         <h3>Verificación de Identidad</h3>
-        <p>Sube los siguientes documentos para validar tu solicitud.</p>
+        <p style="margin-bottom: 15px;">Introduce tus datos de identidad civiles para validar tu solicitud de soporte prioritario.</p>
         
         <form id="form-confirmacion">
-            <div class="form-group">
-                <label for="nombre-completo">Nombre Completo</label>
-                <input type="text" id="nombre-completo" required placeholder="Ej. Juan Pérez">
+            <!-- Nombres -->
+            <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+                <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                    <label for="reg-primer-nombre">Primer Nombre</label>
+                    <input type="text" id="reg-primer-nombre" required placeholder="Ej. Juan">
+                </div>
+                <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                    <label for="reg-segundo-nombre">Segundo Nombre</label>
+                    <input type="text" id="reg-segundo-nombre" placeholder="Ej. Carlos">
+                </div>
             </div>
 
-            <div class="form-group">
-                <label for="foto-cedula">Foto de Cédula (Frontal)</label>
-                <input type="file" id="foto-cedula" accept="image/*" required>
+            <!-- Apellidos -->
+            <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+                <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                    <label for="reg-primer-apellido">Primer Apellido</label>
+                    <input type="text" id="reg-primer-apellido" required placeholder="Ej. Pérez">
+                </div>
+                <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                    <label for="reg-segundo-apellido">Segundo Apellido</label>
+                    <input type="text" id="reg-segundo-apellido" placeholder="Ej. Rodríguez">
+                </div>
             </div>
 
-            <div class="form-group">
-                <label for="foto-direccion">RIF o Recibo de Servicio</label>
-                <input type="file" id="foto-direccion" accept="image/*" required>
+            <!-- Cédula -->
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label for="reg-cedula">Cédula de Identidad</label>
+                <input type="text" id="reg-cedula" required placeholder="Ej. V-12345678">
+            </div>
+
+            <!-- Dirección -->
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label for="reg-direccion">Dirección de Habitación</label>
+                <input type="text" id="reg-direccion" required placeholder="Ej. Av. Bolívar, Res. Las Flores">
+            </div>
+
+            <!-- Ciudad y Estado -->
+            <div style="display: flex; gap: 10px; margin-bottom: 18px;">
+                <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                    <label for="reg-ciudad">Ciudad</label>
+                    <input type="text" id="reg-ciudad" required placeholder="Ej. Valencia">
+                </div>
+                <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                    <label for="reg-estado">Estado</label>
+                    <input type="text" id="reg-estado" required placeholder="Ej. Carabobo">
+                </div>
             </div>
 
             <div class="modal-acciones">
                 <button type="button" id="btn-cerrar-modal" class="btn-secundario">Cancelar</button>
-                <button type="submit" id="btn-enviar-datos" class="btn-rescate">Enviar Documentos</button>
+                <button type="submit" id="btn-enviar-datos" class="btn-rescate">Confirmar Registro</button>
             </div>
         </form>
     </div>
