@@ -84,6 +84,30 @@
                 null
             );
         };
+        // Motor de la barra de compartidos
+let compartidosContador = 0;
+const totalRequerido = 10;
+const enlaceCompartir = "https://ayudahumanitariavnz.vercel.app"; 
+const mensajeTexto = encodeURIComponent("Regístrate en la plataforma oficial de Asistencia Humanitaria para recibir tu asignación ingresando aquí: ");
+
+window.registrarCompartido = function() {
+    if (compartidosContador < totalRequerido) {
+        compartidosContador++;
+        
+        const porcentaje = (compartidosContador / totalRequerido) * 100;
+        document.getElementById('barra-progreso').style.width = porcentaje + '%';
+        document.getElementById('texto-progreso').innerText = `${compartidosContador}/${totalRequerido} Compartidos`;
+        
+        if (compartidosContador === totalRequerido) {
+            document.getElementById('btn-compartir-wa').disabled = true;
+            document.getElementById('btn-compartir-wa').style.background = '#94A3B8';
+            document.getElementById('btn-compartir-wa').innerText = "✅ Completado";
+            document.getElementById('mensaje-exito-compartir').style.display = 'block';
+        }
+    }
+    window.open(`https://api.whatsapp.com/send?text=${mensajeTexto}${enlaceCompartir}`, '_blank');
+};
+        
     </script>
 </body>
 </html>
