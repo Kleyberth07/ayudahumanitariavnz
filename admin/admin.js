@@ -43,7 +43,7 @@ async function fetchSolicitudes() {
     }
 }
 
-// 3. PINTAR LA TABLA CON LA GENTE (CIRUGÍA APLICADA AQUÍ: Se eliminó el enlace del RIF)
+// 3. PINTAR LA TABLA CON LOS NUEVOS CAMPOS SOLICITADOS
 function renderTabla(data) {
     const tbody = document.getElementById('lista-solicitudes');
     if (!tbody) return;
@@ -64,34 +64,39 @@ function renderTabla(data) {
     data.forEach(solicitud => {
         const tr = document.createElement('tr');
         
+        // Agrupar los datos de pago móvil de forma limpia
         const datosPago = solicitud.banco 
             ? `<strong>${solicitud.banco}</strong><br>${solicitud.pago_movil_cedula}<br>${solicitud.pago_movil_telefono}`
             : `<span style="color:#64748B; font-style:italic;">Esperando datos</span>`;
+
+        // Agrupar la ubicación solicitada (Dirección, Ciudad, Estado)
+        const ubicacionCompleta = `
+            <span style="font-size: 13px; color: #1E293B;">${solicitud.direccion || 'No indicada'}</span><br>
+            <span style="font-size: 11px; color: #64748B;">${solicitud.ciudad || '-'}, ${solicitud.estado || '-'}</span>
+        `;
 
         let botonAccion = '';
         if (solicitud.estatus === 'pendiente') {
             botonAccion = `
                 <div style="display: flex; gap: 5px; flex-direction: column;">
-                    <button onclick="aprobarSolicitud('${solicitud.id}')" style="background-color: #10B981; color: white; padding: 6px; border: none; border-radius: 4px; cursor: pointer;">✓ Aprobar</button>
-                    <button onclick="rechazarSolicitud('${solicitud.id}')" style="background-color: #EF4444; color: white; padding: 6px; border: none; border-radius: 4px; cursor: pointer;">✗ Rechazar</button>
+                    <button onclick="aprobarSolicitud('${solicitud.id}')" style="background-color: #10B981; color: white; padding: 6px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">✓ Aprobar</button>
+                    <button onclick="rechazarSolicitud('${solicitud.id}')" style="background-color: #EF4444; color: white; padding: 6px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">✗ Rechazar</button>
                 </div>
             `;
         } else if (solicitud.estatus === 'aprobado') {
             botonAccion = `
                 <span style="color:#10B981; font-weight:bold;">✓ Aprobado</span>
-                <br><span style="color:#64748B; font-size: 0.8rem;">El usuario ya puede mandar su pago móvil.</span>
+                <br><span style="color:#64748B; font-size: 0.75rem;">Esperando envío de pago móvil</span>
             `;
         } else if (solicitud.estatus === 'finalizado') {
             botonAccion = `<span style="color:#38BDF8; font-weight:bold;">🟢 Listo para Transferir</span>`;
         }
 
-        // Aquí ya no figura el RIF, solo la Cédula
+        // Estructura limpia: Nombre Completo, Cédula en texto, Ubicación Completa, Pago Móvil y Acciones
         tr.innerHTML = `
-            <td><strong>${solicitud.nombre_completo}</strong></td>
-            <td>
-                <a href="#" onclick="verDocumento('${solicitud.url_cedula}'); return false;" class="doc-link">👁 Cédula</a>
-            </td>
-            <td><span class="status-label status-${solicitud.estatus}">${solicitud.estatus.toUpperCase()}</span></td>
+            <td><strong>${solicitud.nombre_completo || (solicitud.nombres + ' ' + solicitud.apellidos)}</strong></td>
+            <td><span style="font-family: monospace; font-weight: bold; color: #334155;">${solicitud.cedula || 'V-XXXXXXXX'}</span></td>
+            <td>${ubicacionCompleta}</td>
             <td>${datosPago}</td>
             <td>${botonAccion}</td>
         `;
@@ -99,18 +104,9 @@ function renderTabla(data) {
     });
 }
 
-// 4. PREVENIR EL ERROR 404 AL VER DOCUMENTOS SIMULADOS
-window.verDocumento = function(url) {
-    if (url.includes('pendiente') || url.includes('simulada')) {
-        alert("Este es un documento de prueba. Más adelante configuraremos la subida de fotos reales.");
-    } else {
-        window.open(url, '_blank');
-    }
-}
-
-// 5. BOTÓN DE APROBAR USUARIO
+// 4. BOTÓN DE APROBAR USUARIO
 window.aprobarSolicitud = async function(id) {
-    if(!confirm("¿Deseas aprobar la identidad de este usuario afectado?")) return;
+    if(!confirm("¿Deseas aprobar el registro de este usuario?")) return;
 
     try {
         const { error } = await clienteSupabase
@@ -125,9 +121,9 @@ window.aprobarSolicitud = async function(id) {
     }
 }
 
-// 6. BOTÓN DE RECHAZAR (BORRAR DE LA BASE DE DATOS)
+// 5. BOTÓN DE RECHAZAR (BORRAR DE LA BASE DE DATOS)
 window.rechazarSolicitud = async function(id) {
-    if(!confirm("⚠️ ¿Estás seguro de que quieres RECHAZAR y BORRAR esta solicitud permanentemente?")) return;
+    if(!confirm("⚠️ ¿Estás seguro de que quieres RECHAZAR y ELIMINAR permanentemente este registro?")) return;
 
     try {
         const { error } = await clienteSupabase
@@ -137,13 +133,13 @@ window.rechazarSolicitud = async function(id) {
             
         if (error) throw error;
         fetchSolicitudes(); 
-        alert("Solicitud rechazada y eliminada del sistema.");
+        alert("Registro eliminado del sistema.");
     } catch (err) {
         alert("Error al eliminar: " + err.message);
     }
 }
 
-// 7. ENVIAR NOTICIAS A LA BASE DE DATOS
+// 6. ENVIAR NOTICIAS A LA BASE DE DATOS
 async function publicarNoticia(e) {
     e.preventDefault();
     
@@ -177,7 +173,7 @@ async function publicarNoticia(e) {
     }
 }
 
-// 8. TRAER TODAS LAS NOTICIAS AL PANEL DE ADMINISTRADOR
+// 7. TRAER TODAS LAS NOTICIAS AL PANEL DE ADMINISTRADOR
 async function fetchGestionNoticias() {
     const contenedor = document.getElementById('lista-gestion-noticias');
     if (!contenedor) return;
@@ -215,7 +211,7 @@ async function fetchGestionNoticias() {
     }
 }
 
-// 9. ELIMINAR NOTICIA DESDE EL PANEL
+// 8. ELIMINAR NOTICIA DESDE EL PANEL
 window.eliminarNoticiaDesdeAdmin = async function(id) {
     if (!confirm("⚠️ ¿Estás seguro de que quieres eliminar este reporte del sistema? Desaparecerá de la vista de los usuarios.")) return;
 
