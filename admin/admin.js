@@ -1,5 +1,5 @@
 // GUARDIA DE SEGURIDAD
-const CLAVE_ADMIN = "Kley.1234#"; // <--- Cambia esto por la clave que quieras
+const CLAVE_ADMIN = "TU_CLAVE_AQUI"; // <--- Cambia esto por la clave que quieras
 const claveIngresada = prompt("⚠️ Acceso restringido. Introduce la clave de administrador:");
 
 if (claveIngresada !== CLAVE_ADMIN) {
@@ -14,12 +14,12 @@ const clienteSupabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 document.addEventListener('DOMContentLoaded', () => {
     fetchSolicitudes();
-    fetchGestionNoticias(); // CIRUGÍA: Cargar lista de noticias al entrar
+    fetchGestionNoticias(); 
     
     const btnRefrescar = document.getElementById('btn-refrescar');
     if (btnRefrescar) btnRefrescar.addEventListener('click', () => {
         fetchSolicitudes();
-        fetchGestionNoticias(); // CIRUGÍA: Refrescar noticias también
+        fetchGestionNoticias(); 
     });
     
     const formNoticia = document.getElementById('form-publicar-noticia');
@@ -43,7 +43,7 @@ async function fetchSolicitudes() {
     }
 }
 
-// 3. PINTAR LA TABLA CON LA GENTE
+// 3. PINTAR LA TABLA CON LA GENTE (CIRUGÍA APLICADA AQUÍ: Se eliminó el enlace del RIF)
 function renderTabla(data) {
     const tbody = document.getElementById('lista-solicitudes');
     if (!tbody) return;
@@ -68,7 +68,6 @@ function renderTabla(data) {
             ? `<strong>${solicitud.banco}</strong><br>${solicitud.pago_movil_cedula}<br>${solicitud.pago_movil_telefono}`
             : `<span style="color:#64748B; font-style:italic;">Esperando datos</span>`;
 
-        // LÓGICA DE BOTONES: Aprobar, Rechazar o Mostrar Estado
         let botonAccion = '';
         if (solicitud.estatus === 'pendiente') {
             botonAccion = `
@@ -86,11 +85,11 @@ function renderTabla(data) {
             botonAccion = `<span style="color:#38BDF8; font-weight:bold;">🟢 Listo para Transferir</span>`;
         }
 
+        // Aquí ya no figura el RIF, solo la Cédula
         tr.innerHTML = `
             <td><strong>${solicitud.nombre_completo}</strong></td>
             <td>
                 <a href="#" onclick="verDocumento('${solicitud.url_cedula}'); return false;" class="doc-link">👁 Cédula</a>
-                <a href="#" onclick="verDocumento('${solicitud.url_direccion}'); return false;" class="doc-link">👁 RIF</a>
             </td>
             <td><span class="status-label status-${solicitud.estatus}">${solicitud.estatus.toUpperCase()}</span></td>
             <td>${datosPago}</td>
@@ -167,7 +166,7 @@ async function publicarNoticia(e) {
 
         alert("¡Reporte oficial publicado con éxito!");
         document.getElementById('form-publicar-noticia').reset();
-        fetchGestionNoticias(); // CIRUGÍA: Actualiza la lista al publicar
+        fetchGestionNoticias(); 
     } catch (err) {
         alert("Error al publicar noticia: " + err.message);
     } finally {
@@ -178,7 +177,7 @@ async function publicarNoticia(e) {
     }
 }
 
-// CIRUGÍA: 8. TRAER TODAS LAS NOTICIAS AL PANEL DE ADMINISTRADOR
+// 8. TRAER TODAS LAS NOTICIAS AL PANEL DE ADMINISTRADOR
 async function fetchGestionNoticias() {
     const contenedor = document.getElementById('lista-gestion-noticias');
     if (!contenedor) return;
@@ -216,7 +215,7 @@ async function fetchGestionNoticias() {
     }
 }
 
-// CIRUGÍA: 9. ELIMINAR NOTICIA DESDE EL PANEL
+// 9. ELIMINAR NOTICIA DESDE EL PANEL
 window.eliminarNoticiaDesdeAdmin = async function(id) {
     if (!confirm("⚠️ ¿Estás seguro de que quieres eliminar este reporte del sistema? Desaparecerá de la vista de los usuarios.")) return;
 
@@ -228,9 +227,8 @@ window.eliminarNoticiaDesdeAdmin = async function(id) {
 
         if (error) throw error;
         alert("Reporte eliminado correctamente.");
-        fetchGestionNoticias(); // Refresca la lista de noticias tras borrar
+        fetchGestionNoticias(); 
     } catch (err) {
         alert("Error al eliminar el reporte: " + err.message);
     }
-               }
-            
+}
