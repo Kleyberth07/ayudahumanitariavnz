@@ -56,6 +56,26 @@
                 </table>
             </div>
         </section>
+
+        <!-- CIRUGÍA: Formulario integrado para conectar con la lógica existente de admin.js -->
+        <section class="tabla-contenedor" style="margin-top: 20px; padding: 20px;">
+            <h3 style="margin-top: 0; margin-bottom: 15px;">📢 Publicar Nuevo Reporte / Noticia</h3>
+            <form id="form-publicar-noticia">
+                <div style="margin-bottom: 12px;">
+                    <label style="display:block; font-weight:bold; margin-bottom:5px; color:#1E293B;">Título del Reporte:</label>
+                    <input type="text" id="noticia-titulo" required placeholder="Ej. Actualización de asignaciones en Valencia" style="width:100%; padding:8px; border:1px solid #CBD5E1; border-radius:4px; box-sizing:border-box;">
+                </div>
+                <div style="margin-bottom: 12px;">
+                    <label style="display:block; font-weight:bold; margin-bottom:5px; color:#1E293B;">Contenido del Reporte:</label>
+                    <textarea id="noticia-contenido" required rows="4" placeholder="Escribe los detalles oficiales del reporte aquí..." style="width:100%; padding:8px; border:1px solid #CBD5E1; border-radius:4px; box-sizing:border-box; resize:vertical;"></textarea>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display:block; font-weight:bold; margin-bottom:5px; color:#1E293B;">URL de la Imagen (Opcional):</label>
+                    <input type="text" id="noticia-url-img" placeholder="Ej. https://enlace.com/imagen.jpg" style="width:100%; padding:8px; border:1px solid #CBD5E1; border-radius:4px; box-sizing:border-box;">
+                </div>
+                <button type="submit" style="background-color:#10B981; color:white; font-weight:bold; padding:10px 20px; border:none; border-radius:4px; cursor:pointer; width:100%;">Publicar Reporte</button>
+            </form>
+        </section>
     </main>
 
     <script src="admin.js"></script>
